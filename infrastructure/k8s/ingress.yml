@@ -1,0 +1,56 @@
+# Human Tasks:
+# 1. Verify that the NGINX Ingress Controller is installed in the cluster
+# 2. Ensure DNS records are configured to point to the Ingress Controller's external IP/hostname
+# 3. Consider implementing TLS/SSL certificates for HTTPS in production
+# 4. Review and adjust NGINX annotations based on specific environment requirements
+# 5. Verify network policies allow traffic to ingress controller pods
+
+# Requirement: Application Access
+# Configures Kubernetes Ingress for routing external traffic to Spring Boot application
+# using NGINX Ingress Controller with path-based routing rules
+apiVersion: networking.k8s.io/v1  # Kubernetes Ingress API version
+kind: Ingress
+metadata:
+  name: spring-boot-ingress
+  namespace: default
+  annotations:
+    # NGINX Ingress Controller version: 1.8.1
+    # Requirement: Application Access
+    # Configure URL rewriting and SSL settings
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    # Additional recommended NGINX annotations for production workloads
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+
+spec:
+  # Specify NGINX as the Ingress Controller implementation
+  ingressClassName: nginx
+  
+  # Requirement: Application Access, Management Endpoints
+  # Define routing rules for both main application and actuator endpoints
+  rules:
+    - http:
+        paths:
+          # Main application path
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Reference to spring-boot-app-service defined in service.yml
+                name: spring-boot-app-service
+                port:
+                  number: 80
+          
+          # Requirement: Management Endpoints
+          # Actuator endpoints path for monitoring and management
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: spring-boot-app-service
+                port:
+                  number: 80
