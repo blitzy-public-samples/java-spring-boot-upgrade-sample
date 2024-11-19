@@ -1,0 +1,22 @@
+# Last matching pattern takes precedence
+
+# Backend source code - Spring Boot 3 application code, services, and controllers
+/src/backend/ @backend-team
+
+# Spring Boot actuator components - health indicators, info contributors and metrics
+/src/backend/src/main/java/sample/actuator/ @backend-team @platform-team
+
+# Infrastructure configuration - Docker and deployment configs
+/infrastructure/ @devops-team @platform-team
+
+# Application properties and configuration files
+*.properties @platform-team
+
+# Maven build configuration
+pom.xml @platform-team @build-team
+
+# Docker configuration files
+Dockerfile* @devops-team
+
+# GitHub Actions CI/CD workflows
+.github/workflows/ @devops-team @platform-team
