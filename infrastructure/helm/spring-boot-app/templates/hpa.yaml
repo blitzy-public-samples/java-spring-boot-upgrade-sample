@@ -1,0 +1,43 @@
+# Required human tasks:
+# 1. Verify cluster has metrics-server installed and running for HPA metrics collection
+# 2. Ensure resource requests are properly set in deployment.yaml for HPA to function
+# 3. Review autoscaling thresholds match application performance characteristics
+# 4. Confirm cluster has sufficient capacity to handle max replicas
+
+# Requirement: Application Autoscaling
+# Using Kubernetes autoscaling/v2 API for advanced metrics support
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "spring-boot-app.fullname" . }}
+  labels:
+    {{- include "spring-boot-app.labels" . | nindent 4 }}
+
+spec:
+  # Reference to the deployment resource to be scaled
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "spring-boot-app.fullname" . }}
+  
+  # Requirement: Application Autoscaling - Configure scaling boundaries
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  
+  # Requirement: Application Autoscaling - Define scaling metrics
+  metrics:
+    # CPU utilization based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    
+    # Memory utilization based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
