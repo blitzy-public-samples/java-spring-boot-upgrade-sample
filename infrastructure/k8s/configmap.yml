@@ -1,0 +1,38 @@
+# Kubernetes API version v1 for ConfigMap resource
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  # Requirement: Application Configuration
+  # Configures the ConfigMap name and namespace for Spring Boot application settings
+  name: spring-boot-config
+  namespace: default
+  labels:
+    app: spring-boot-app
+    environment: production
+
+data:
+  # Requirement: Application Configuration, Spring Boot 3 Migration
+  # Maps Spring Boot application.properties settings into Kubernetes-consumable format
+  application.properties: |
+    # Management Configuration
+    management.server.address=127.0.0.1
+    management.endpoints.web.exposure.include=*
+    management.endpoint.shutdown.enabled=true
+    management.httptrace.include=REQUEST_HEADERS,RESPONSE_HEADERS,PRINCIPAL,REMOTE_ADDRESS,SESSION_ID
+
+    # Server Configuration
+    server.tomcat.accesslog.enabled=true
+    server.tomcat.accesslog.pattern=%h %t "%r" %s %b
+
+    # Spring Framework Configuration
+    spring.jmx.enabled=true
+    spring.jackson.serialization.write_dates_as_timestamps=false
+
+  # Production-specific overrides with enhanced security settings
+  application-prod.properties: |
+    # Production Management Configuration
+    management.server.address=0.0.0.0
+    management.endpoints.web.exposure.include=health,info,metrics
+    
+    # Production Access Logging with Extended Pattern
+    server.tomcat.accesslog.pattern=%t %a "%r" %s %b %D "%{Referer}i" "%{User-Agent}i" %{X-Forwarded-For}i
