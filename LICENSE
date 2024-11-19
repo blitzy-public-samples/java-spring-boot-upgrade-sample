@@ -1,0 +1,65 @@
+MIT License
+
+Copyright (c) 2023 Spring Boot Sample Application
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), including
+but not limited to Spring Boot 3, Java 6.x components, Spring Actuator, Web,
+JDBC modules, H2 database, testing frameworks, Maven build configurations, and
+Docker containerization files, to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Third Party Components:
+
+1. Spring Boot (Version 3.x)
+   - License: Apache License 2.0
+   - https://github.com/spring-projects/spring-boot/blob/main/LICENSE.txt
+
+2. Java Platform (Version 6.x)
+   - License: GPL v2 with Classpath Exception
+   - https://openjdk.java.net/legal/gplv2+ce.html
+
+3. Spring Framework Components
+   - Spring Actuator
+   - Spring Web
+   - Spring JDBC
+   - License: Apache License 2.0
+   - https://github.com/spring-projects/spring-framework/blob/main/LICENSE.txt
+
+4. H2 Database Engine
+   - License: MPL 2.0 or EPL 1.0
+   - http://www.h2database.com/html/license.html
+
+5. Testing Frameworks
+   - JUnit: Eclipse Public License 1.0
+   - Mockito: MIT License
+   - RestAssured: Apache License 2.0
+
+6. Maven Build System
+   - License: Apache License 2.0
+   - https://maven.apache.org/ref/3.5.2/license.html
+
+7. Docker
+   - License: Apache License 2.0
+   - https://www.docker.com/legal/components-licenses
+
+For the complete text of the Apache License 2.0, visit:
+http://www.apache.org/licenses/LICENSE-2.0
+
+Note: This license applies to the application code and configurations. Each
+dependency retains its own license as listed above. Users must comply with all
+applicable licenses when using, modifying or distributing this software.
