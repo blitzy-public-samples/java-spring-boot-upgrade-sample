@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
+
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/src/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "java"
+    assignees:
+      - "CODEOWNERS"
+    reviewers:
+      - "CODEOWNERS"
+    target-branch: "main"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    assignees:
+      - "CODEOWNERS"
+    reviewers:
+      - "CODEOWNERS"
+    target-branch: "main"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  - package-ecosystem: "docker"
+    directory: "/src/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "docker"
+    assignees:
+      - "CODEOWNERS"
+    reviewers:
+      - "CODEOWNERS"
+    target-branch: "main"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure/terraform"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "terraform"
+    assignees:
+      - "CODEOWNERS"
+    reviewers:
+      - "CODEOWNERS"
+    target-branch: "main"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
