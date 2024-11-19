@@ -1,0 +1,35 @@
+.git
+.gitignore
+
+# Exclude build and dependency management files
+.mvn
+target
+*.jar
+
+# Exclude test files and resources
+src/test
+
+# Exclude documentation files
+*.md
+
+# Exclude configuration files
+*.yml
+*.properties
+*.xml
+.editorconfig
+checkstyle.xml
+lombok.config
+sonar-project.properties
+spotbugs-exclude.xml
+
+# Exclude infrastructure and deployment files
+infrastructure
+
+# Exclude logs and environment files for security
+*.log
+.env*
+
+# Exception patterns - must come after the patterns they override
+!docker-compose.yml
+!pom.xml
+!src/main/resources/application.properties
