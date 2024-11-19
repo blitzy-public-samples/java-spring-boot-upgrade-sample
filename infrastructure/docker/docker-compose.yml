@@ -1,0 +1,89 @@
+# Docker Compose configuration for Spring Boot Application Deployment
+# Docker Compose version: 3.8
+
+# Requirement: Containerized Deployment
+# Defines multi-container deployment setup with proper service isolation and networking
+version: '3.8'
+
+services:
+  # Spring Boot Application Service
+  # Requirement: Containerized Deployment - Application service configuration
+  app:
+    build:
+      context: ../../src/backend
+      dockerfile: Dockerfile
+    image: spring-boot-app:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/springboot
+      - MANAGEMENT_SERVER_PORT=8080
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - app_network
+    # Requirement: Health Monitoring - Application health check configuration
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "3", "-s", "http://localhost:8080/actuator/health"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  # PostgreSQL Database Service
+  # Requirement: Database Integration - Database service configuration with persistent storage
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+    # Requirement: Health Monitoring - Database health check configuration
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy Service
+  # Requirement: Containerized Deployment - Nginx reverse proxy configuration
+  nginx:
+    image: nginx:1.25.3-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - app_network
+    # Requirement: Health Monitoring - Nginx health check configuration
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+# Persistent Volumes Configuration
+# Requirement: Database Integration - Configure persistent storage for database
+volumes:
+  postgres_data:
+    driver: local
+
+# Network Configuration
+# Requirement: Containerized Deployment - Define isolated network for services
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      driver: default
