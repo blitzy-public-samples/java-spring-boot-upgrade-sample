@@ -1,0 +1,66 @@
+# Configuration values for Spring Boot 3 application Helm chart
+# Requirement: Spring Boot Application Configuration - Defines deployment parameters for Spring Boot 3 app with actuator endpoints
+
+# Number of pod replicas to run
+replicaCount: 1
+
+# Container image configuration
+image:
+  repository: spring-boot-2-sample-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Override name and fullname if needed
+nameOverride: ""
+fullnameOverride: ""
+
+# Service configuration for exposing the application
+service:
+  type: ClusterIP
+  port: 8080
+
+# Resource limits and requests for the application pods
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Spring Boot Actuator configuration
+actuator:
+  enabled: true
+  port: 8080
+  path: /actuator
+
+# Spring Boot application configuration
+springApplication:
+  profile: prod
+  version: 3.0.0
+
+# Pod annotations if needed
+podAnnotations: {}
+
+# Deployment strategy configuration
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# Liveness probe configuration using actuator health endpoint
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 30
+
+# Readiness probe configuration using actuator health endpoint
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 15
