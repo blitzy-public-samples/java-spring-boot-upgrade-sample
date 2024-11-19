@@ -1,0 +1,22 @@
+# Helm Chart version: v2
+# This Chart.yaml defines the Helm chart metadata for deploying a Spring Boot 3 application 
+# with actuator endpoints to Kubernetes, including health checks, metrics, and management endpoints
+# Requirement Addressed: Spring Boot Application Deployment
+
+apiVersion: v2
+name: spring-boot-app
+description: A Helm chart for deploying Spring Boot 3 application with actuator endpoints including health checks, metrics and management features
+version: 0.1.0
+appVersion: "2.0.2"
+type: application
+keywords:
+  - spring-boot
+  - java
+  - web
+  - actuator
+  - metrics
+  - monitoring
+  - health-check
+maintainers:
+  - name: Project Team
+    email: team@example.com
