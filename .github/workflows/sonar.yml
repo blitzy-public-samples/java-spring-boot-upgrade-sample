@@ -37,9 +37,9 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for better relevancy of analysis
       
       # Setup Java 17 environment
-      # actions/setup-java@v3
+      # actions/setup-java@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'  # Matches java.version from pom.xml
           distribution: 'temurin'
