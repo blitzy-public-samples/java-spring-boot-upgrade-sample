@@ -1,0 +1,18 @@
+# Requirement Addressed: Spring Boot Application Exposure
+# Defines a Kubernetes Service resource that exposes the Spring Boot application
+# on port 8080 for HTTP traffic and enables access to actuator endpoints
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "spring-boot-app.fullname" . }}
+  labels:
+    {{- include "spring-boot-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "spring-boot-app.selectorLabels" . | nindent 4 }}
