@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "service.name",
+      "type": "java.lang.String",
+      "description": "Name of the service. This property is bound to the ServiceProperties class and validated for unknown fields.",
+      "sourceType": "sample.actuator.ServiceProperties",
+      "defaultValue": "World"
+    }
+  ],
+  "hints": [],
+  "groups": [
+    {
+      "name": "service",
+      "type": "sample.actuator.ServiceProperties",
+      "sourceType": "sample.actuator.ServiceProperties"
+    }
+  ]
+}
