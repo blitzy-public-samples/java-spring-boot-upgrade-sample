@@ -1,0 +1,50 @@
+# Helm Version: 3.12.3
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "spring-boot-app.fullname" . }}-config
+  labels:
+    {{- include "spring-boot-app.labels" . | nindent 4 }}
+data:
+  # Requirement: Spring Boot 3 Migration
+  # Base application properties for all environments
+  application.properties: |
+    # Actuator Configuration
+    {{- if .Values.actuator.enabled }}
+    management.server.address=127.0.0.1
+    management.endpoints.web.base-path={{ .Values.actuator.path }}
+    management.endpoints.web.exposure.include=*
+    management.endpoint.shutdown.enabled=true
+    management.httptrace.include=REQUEST_HEADERS,RESPONSE_HEADERS,PRINCIPAL,REMOTE_ADDRESS,SESSION_ID
+    {{- end }}
+
+    # Server Configuration
+    server.tomcat.accesslog.enabled=true
+
+    # Spring Configuration
+    spring.jmx.enabled=true
+    spring.jackson.serialization.write_dates_as_timestamps=false
+    spring.application.version={{ .Values.springApplication.version }}
+
+  # Requirement: Application Configuration
+  # Production-specific properties
+  application-prod.properties: |
+    {{- if eq .Values.springApplication.profile "prod" }}
+    # Production Environment Specific Settings
+    server.port={{ .Values.service.port }}
+    
+    # Actuator Production Settings
+    {{- if .Values.actuator.enabled }}
+    management.server.port={{ .Values.actuator.port }}
+    management.endpoints.web.cors.allowed-origins=https://*.example.com
+    management.endpoints.web.cors.allowed-methods=GET,POST
+    {{- end }}
+
+    # Logging Configuration for Production
+    logging.level.root=INFO
+    logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+    
+    # Spring Boot 3 Production Optimizations
+    spring.main.lazy-initialization=true
+    spring.jpa.open-in-view=false
+    {{- end }}
