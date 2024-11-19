@@ -1,0 +1,91 @@
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Logs and databases
+*.log
+logs/
+*.logs
+dump.rdb
+transaction-logs
+activemq-data
+
+# IDE - Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+.metadata
+.recommenders
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - VS Code
+.vscode/
+
+# Build directories
+target/
+bin/
+build/
+out/
+/build
+/code
+
+# Maven specific
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+dependency-reduced-pom.xml
+.flattened-pom.xml
+interpolated*.xml
+settings.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle specific
+.gradle/
+.gradletasknamecache
+!gradle/wrapper/gradle-wrapper.jar
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Application specific
+.env
+secrets.yml
+MANIFEST.MF
+manifest.yml
+overridedb.*
+
+# Node/NPM/Yarn (for frontend if present)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+
+# Test coverage
+coverage/
+
+# Temp files
+*.swp
+*.swo
+*.bak
+*.sw?
+*~
+.#*
+*.md.html
+build.log
