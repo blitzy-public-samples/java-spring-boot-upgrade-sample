@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SpotBugs Filter Configuration - Version 4.7.3 -->
+<!-- Purpose: Exclude false positives and intended patterns during Spring Boot 3 and Java 6.x migration -->
+
+<FindBugsFilter>
+    <!-- Spring Boot 3 Migration Related Exclusions -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class pattern="~.*\.(dto|model|entity)\..*"/>
+        <Or>
+            <Method pattern="get.*"/>
+            <Method pattern="set.*"/>
+        </Or>
+    </Match>
+
+    <!-- Exclude serialization warnings for DTOs and Entities -->
+    <Match>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+        <Class pattern="~.*\.(dto|model|entity)\..*"/>
+    </Match>
+
+    <!-- Exclude warnings about unread fields in configuration classes -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class pattern="~.*Configuration$"/>
+    </Match>
+
+    <!-- Exclude warnings about non-final static fields in Spring components -->
+    <Match>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Class pattern="~.*\.(service|component|controller)\..*"/>
+    </Match>
+
+    <!-- Exclude warnings about synchronized methods in Spring services -->
+    <Match>
+        <Bug category="MT_CORRECTNESS"/>
+        <Class pattern="~.*Service(Impl)?$"/>
+    </Match>
+
+    <!-- Exclude null pointer warnings in Spring Boot test classes -->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+        <Class pattern="~.*Test$"/>
+    </Match>
+
+    <!-- Exclude warnings about unused fields in Spring Boot properties classes -->
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class pattern="~.*Properties$"/>
+    </Match>
+
+    <!-- Exclude warnings about lazy initialization of static fields in Spring components -->
+    <Match>
+        <Bug pattern="LI_LAZY_INIT_STATIC"/>
+        <Class pattern="~.*\.(repository|dao)\..*"/>
+    </Match>
+
+    <!-- Exclude certain security warnings for authenticated endpoints -->
+    <Match>
+        <Bug category="SECURITY"/>
+        <Class pattern="~.*Controller$"/>
+        <Method pattern="~.*(authenticated|secured).*"/>
+        <Bug pattern="SPRING_CSRF_PROTECTION_DISABLED"/>
+    </Match>
+
+    <!-- Exclude warnings about exposed internal representations in builder patterns -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class pattern="~.*Builder$"/>
+    </Match>
+
+    <!-- Exclude warnings about non-serializable objects in session attributes -->
+    <Match>
+        <Bug pattern="SE_BAD_FIELD"/>
+        <Class pattern="~.*Controller$"/>
+        <Field pattern="~.*Attribute$"/>
+    </Match>
+
+    <!-- Exclude warnings about wait() in Spring async methods -->
+    <Match>
+        <Bug pattern="WA_NOT_IN_LOOP"/>
+        <Method pattern="~.*Async$"/>
+    </Match>
+
+    <!-- Exclude certain performance warnings in test configurations -->
+    <Match>
+        <Bug category="PERFORMANCE"/>
+        <Class pattern="~.*TestConfiguration$"/>
+    </Match>
+
+    <!-- Exclude warnings about unread public/protected fields in Spring Data specifications -->
+    <Match>
+        <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Class pattern="~.*Specification$"/>
+    </Match>
+
+    <!-- Exclude warnings about comparator implementations -->
+    <Match>
+        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+        <Class pattern="~.*Comparator$"/>
+    </Match>
+
+    <!-- Exclude certain correctness warnings for Spring scheduled tasks -->
+    <Match>
+        <Bug category="CORRECTNESS"/>
+        <Method pattern="~.*Scheduled.*"/>
+        <Bug confidence="LOW"/>
+    </Match>
+</FindBugsFilter>
