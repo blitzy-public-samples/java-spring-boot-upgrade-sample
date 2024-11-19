@@ -1,0 +1,98 @@
+# Docker Compose version 3.8 configuration for Spring Boot application environment
+version: '3.8'
+
+services:
+  # Requirement: Docker Container Configuration
+  # Main Spring Boot application service with actuator endpoints
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      # Requirement: Application Properties - Management endpoints configuration
+      - MANAGEMENT_SERVER_ADDRESS=127.0.0.1
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
+      - MANAGEMENT_ENDPOINT_SHUTDOWN_ENABLED=true
+      # Requirement: Application Properties - Server and logging settings
+      - SERVER_TOMCAT_ACCESSLOG_ENABLED=true
+      - SERVER_TOMCAT_ACCESSLOG_PATTERN=%h %t "%r" %s %b
+      - SPRING_JMX_ENABLED=true
+      - SPRING_JACKSON_SERIALIZATION_WRITE_DATES_AS_TIMESTAMPS=false
+      - JAVA_SECURITY_EGD=file:/dev/./urandom
+    volumes:
+      - ./logs:/tmp/logs
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "3", "-s", "http://localhost:8080/actuator/health"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - spring-net
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Requirement: Database Configuration
+  # H2 Database service with persistent storage
+  db:
+    image: h2:2.1.214
+    container_name: h2-database
+    ports:
+      - "1521:1521"  # TCP port
+      - "81:81"      # Web console port
+    environment:
+      - H2_OPTIONS=-ifNotExists
+      - H2_TCP_PORT=1521
+      - H2_WEB_PORT=81
+    volumes:
+      - h2-data:/h2-data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1521"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    networks:
+      - spring-net
+    restart: unless-stopped
+
+# Network configuration for service isolation
+networks:
+  spring-net:
+    driver: bridge
+    enable_ipv6: false
+    internal: false
+
+# Persistent volume configuration
+volumes:
+  h2-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /var/lib/h2-data
+      o: bind
