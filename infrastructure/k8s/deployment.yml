@@ -1,0 +1,98 @@
+# Human Tasks:
+# 1. Verify that the container image 'spring-boot-3-sample-app:latest' exists in your container registry
+# 2. Ensure proper network policies are configured to allow traffic to port 8080
+# 3. Review and adjust resource limits based on actual application performance metrics
+# 4. Verify that the service account has necessary permissions to pull images and mount secrets
+# 5. Consider implementing horizontal pod autoscaling (HPA) for production workloads
+
+# Requirement: Spring Boot 3 Application Deployment
+# Defines the deployment configuration for running the Spring Boot 3 application
+# in Kubernetes with proper health checks, container settings, and configuration mounting
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-app
+  labels:
+    app: spring-boot-app
+    environment: production
+
+spec:
+  # Requirement: Spring Boot 3 Application Deployment
+  # Maintains high availability with multiple replicas
+  replicas: 2
+  
+  selector:
+    matchLabels:
+      app: spring-boot-app
+  
+  template:
+    metadata:
+      labels:
+        app: spring-boot-app
+        environment: production
+    
+    spec:
+      containers:
+        - name: spring-boot-app
+          # Requirement: Spring Boot 3 Application Deployment
+          # Container image specification
+          image: spring-boot-3-sample-app:latest
+          imagePullPolicy: Always
+          
+          # Container port configuration for HTTP traffic
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          
+          # Requirement: Spring Boot 3 Application Deployment
+          # Health monitoring configuration using Spring Boot Actuator
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          # Requirement: Spring Boot 3 Application Deployment
+          # Resource allocation limits and requests
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+          
+          # Requirement: Spring Boot 3 Application Deployment
+          # Mount configuration and secrets from ConfigMap and Secret
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: true
+            - name: secrets-volume
+              mountPath: /secrets
+              readOnly: true
+      
+      # Volume definitions for configuration and secrets
+      volumes:
+        # Mount ConfigMap containing application.properties
+        - name: config-volume
+          configMap:
+            name: spring-boot-config
+        
+        # Mount Secret containing sensitive configuration
+        - name: secrets-volume
+          secret:
+            secretName: spring-boot-secrets
