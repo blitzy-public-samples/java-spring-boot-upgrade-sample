@@ -1,0 +1,67 @@
+# Human Tasks:
+# 1. Verify that metrics-server is installed and running in the cluster (v0.6+)
+# 2. Ensure RBAC permissions allow HPA to access metrics
+# 3. Monitor initial scaling behavior and adjust thresholds if needed
+# 4. Validate that resource requests are properly set in deployment
+
+# Requirement: Application Containerization
+# Implements horizontal pod autoscaling for the Spring Boot application
+# with CPU and memory-based scaling policies
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: spring-boot-app-hpa
+  labels:
+    app: spring-boot-app
+    environment: production
+
+spec:
+  # Requirement: Application Containerization
+  # References the Spring Boot deployment to be autoscaled
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: spring-boot-app
+
+  # Requirement: Application Containerization
+  # Defines minimum and maximum number of replicas for high availability
+  minReplicas: 2
+  maxReplicas: 10
+
+  # Requirement: Application Containerization
+  # Configures CPU and memory utilization targets for scaling decisions
+  metrics:
+    # CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+    # Memory-based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+  # Requirement: Application Containerization
+  # Defines scaling behavior with stabilization windows to prevent thrashing
+  behavior:
+    # Scale up behavior - more aggressive
+    scaleUp:
+      stabilizationWindowSeconds: 60  # Wait 1 minute before scaling up again
+      policies:
+        - type: Pods
+          value: 2        # Add up to 2 pods at a time
+          periodSeconds: 60
+
+    # Scale down behavior - more conservative
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 minutes before scaling down
+      policies:
+        - type: Pods
+          value: 1        # Remove 1 pod at a time
+          periodSeconds: 60
