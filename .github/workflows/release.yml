@@ -1,0 +1,77 @@
+# Human Tasks:
+# 1. Configure Docker Hub credentials:
+#    - Add DOCKERHUB_USERNAME secret in repository settings
+#    - Add DOCKERHUB_TOKEN secret in repository settings (use access token, not password)
+# 2. Verify repository permissions are set correctly for GitHub Actions
+
+# Addresses requirement: Spring Boot 3 Migration
+# Configures automated release pipeline for Spring Boot 3.x application with Java 17
+name: Release Pipeline
+
+# Trigger workflow on version tags
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Define required permissions
+permissions:
+  contents: write
+  packages: write
+
+# Environment variables
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+  JAVA_VERSION: '17'
+  DISTRIBUTION: 'temurin'
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Addresses requirement: Spring Boot 3 Migration
+      # Checkout repository code for building Spring Boot 3.x application
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Configure Java 17 environment for Spring Boot 3
+      - name: Setup JDK environment
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.DISTRIBUTION }}
+      
+      # Build application using Maven
+      # Uses spring-boot-maven-plugin from pom.xml
+      - name: Build with Maven
+        run: mvn -B package --file src/backend/pom.xml
+      
+      # Run both unit and integration tests
+      # Uses maven-surefire-plugin and maven-failsafe-plugin from pom.xml
+      - name: Run tests
+        run: mvn -B verify --file src/backend/pom.xml
+      
+      # Addresses requirement: Application Containerization
+      # Setup Docker buildx for multi-platform builds
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      # Login to Docker Hub registry
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # Build and push Docker image
+      # Uses Dockerfile configuration with HEALTHCHECK and EXPOSE commands
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: src/backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
