@@ -1,0 +1,87 @@
+# Human Tasks:
+# 1. Replace smtp.example.com with actual SMTP server details
+# 2. Configure SMTP_PASSWORD environment variable for email authentication
+# 3. Configure SLACK_API_URL environment variable for Slack integration
+# 4. Update team@example.com with actual team email address
+# 5. Verify #alerts Slack channel exists and bot has required permissions
+# 6. Place custom notification templates (*.tmpl files) in same directory
+
+# AlertManager v0.25.0 Configuration
+# Requirement: Application Monitoring - Configures alert management for Spring Boot 
+# actuator health indicators and metrics including health checks, resource utilization, 
+# and error rates
+
+# Global configuration
+global:
+  # Time to wait before resending an alert to an alert manager
+  resolve_timeout: 5m
+  # SMTP configuration for email notifications
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'alertmanager@example.com'
+  smtp_auth_username: 'alertmanager'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+# The root route for alert handling
+route:
+  # Group alerts by these labels
+  group_by: ['alertname', 'cluster', 'service']
+  # When a new group is created, wait this long to send initial notification
+  group_wait: 30s
+  # When a group has updates, wait this long to send notification
+  group_interval: 5m
+  # How long to wait before re-sending a notification
+  repeat_interval: 4h
+  # Default receiver for all alerts
+  receiver: 'default-receiver'
+  
+  # Specific routing configurations
+  routes:
+    # Special handling for critical alerts
+    - match:
+        severity: 'critical'
+      receiver: 'default-receiver'
+      # Send critical alerts immediately
+      group_wait: 0s
+      # Re-notify for critical alerts more frequently
+      repeat_interval: 1h
+
+# Alert receivers configuration
+receivers:
+  - name: 'default-receiver'
+    # Email notification configuration
+    email_configs:
+      - to: 'team@example.com'
+        send_resolved: true
+        html: '{{ template "email.default.html" . }}'
+        headers:
+          Subject: '{{ template "email.default.subject" . }}'
+    
+    # Slack notification configuration
+    slack_configs:
+      - channel: '#alerts'
+        send_resolved: true
+        api_url: '${SLACK_API_URL}'
+        title: '{{ template "slack.default.title" . }}'
+        text: '{{ template "slack.default.text" . }}'
+
+# Rules for suppressing notifications
+inhibit_rules:
+  # Suppress warning alerts when there's a critical alert
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    # Apply when these labels match between the source and target alerts
+    equal: ['alertname', 'cluster', 'service']
+
+# Custom notification templates
+templates:
+  - '*.tmpl'
+
+# Load custom templates for notifications
+# These templates should be defined in separate .tmpl files in the same directory
+# - email.default.html
+# - email.default.subject
+# - slack.default.title
+# - slack.default.text
