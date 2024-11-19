@@ -1,0 +1,107 @@
+# Human Tasks:
+# 1. Verify that port 9093 is available for AlertManager
+# 2. Ensure network connectivity between Prometheus and Spring Boot application
+# 3. Verify that rules.yml exists in the specified path
+# 4. Review alert thresholds and adjust based on production requirements
+# 5. Configure authentication if deploying to production environment
+
+# Prometheus v2.45.0 Configuration
+# AlertManager v0.25.0 Integration
+
+# Requirement: Application Monitoring - Configure Prometheus to scrape metrics 
+# from Spring Boot actuator endpoints including health, info and custom metrics
+
+# Global configurations
+global:
+  # Scrape metrics every 15 seconds
+  scrape_interval: 15s
+  # Evaluate rules every 15 seconds
+  evaluation_interval: 15s
+  # Add external labels to identify this Prometheus instance
+  external_labels:
+    monitor: 'spring-boot-monitor'
+
+# Rule files to load
+rule_files:
+  - 'infrastructure/monitoring/rules.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Spring Boot application metrics scraping job
+  - job_name: 'spring-boot'
+    # Override global scrape interval for this job
+    scrape_interval: 15s
+    # Path to metrics endpoint (aligned with Spring Boot Actuator)
+    metrics_path: '/actuator/prometheus'
+    # Use HTTP scheme for scraping
+    scheme: 'http'
+    # Static targets configuration
+    static_configs:
+      # Target matches management.server.address from application.properties
+      - targets: ['127.0.0.1:8080']
+    # Optional metrics relabeling
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: '^jvm_.*'
+        action: keep
+
+# Alert manager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
+      # Use HTTP scheme for alertmanager communication
+      scheme: 'http'
+      # Timeout for alertmanager requests
+      timeout: '10s'
+      # Use v2 API
+      api_version: 'v2'
+
+# Storage configuration
+storage:
+  tsdb:
+    # 15 day retention
+    retention_time: 15d
+    # Minimum block duration
+    min_block_duration: 2h
+
+# Security configuration (basic)
+basic_auth_users:
+  admin: ${PROMETHEUS_ADMIN_PASSWORD}
+
+# Web interface configuration
+web:
+  # Enable admin API
+  enable_admin_api: false
+  # External URL
+  external_url: 'http://localhost:9090'
+  # Page title
+  page_title: 'Spring Boot Application Monitoring'
+  # Maximum connections
+  max_connections: 512
+
+# Query configuration
+query:
+  # Maximum samples in a query
+  max_samples: 50000000
+  # Timeout for queries
+  timeout: 2m
+  # Maximum lookback duration
+  lookback_delta: 5m
+
+# Remote write configuration (optional)
+# Uncomment and configure if using remote storage
+# remote_write:
+#   - url: 'http://remote-storage:9201/write'
+#     remote_timeout: 30s
+#     queue_config:
+#       capacity: 500
+#       max_shards: 1000
+#       max_samples_per_send: 100
+
+# Remote read configuration (optional)
+# Uncomment and configure if using remote storage
+# remote_read:
+#   - url: 'http://remote-storage:9201/read'
+#     read_recent: true
+#     remote_timeout: 1m
