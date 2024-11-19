@@ -1,0 +1,107 @@
+# Human Tasks:
+# 1. Review and adjust alert thresholds based on production requirements
+# 2. Verify metric names match those exposed by Spring Boot Actuator
+# 3. Test alert notifications with AlertManager before production deployment
+# 4. Document runbook procedures for each alert type
+
+# Prometheus Rules Configuration v2.45.0
+# Requirement: Application Monitoring - Monitor Spring Boot actuator endpoints 
+# including health, info and metrics exposed by the application at /actuator/* paths
+
+groups:
+  # Application Health Monitoring Rules
+  - name: application_health
+    rules:
+    # Critical alert for application health check failures
+    - alert: HealthCheckFailure
+      expr: up{job="spring-boot"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Spring Boot application health check failing"
+        description: "Health check endpoint /actuator/health is reporting DOWN status"
+
+    # Warning alert for high HTTP error rates
+    - alert: HighErrorRate
+      expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) > 0.1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High HTTP 5xx error rate"
+        description: "Error rate exceeds 10% in last 5 minutes"
+
+    # Warning alert for high latency
+    - alert: HighLatency
+      expr: http_server_requests_seconds_max > 2
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High request latency"
+        description: "Request latency exceeds 2 seconds"
+
+    # Critical alert for application instance down
+    - alert: InstanceDown
+      expr: spring_boot_actuator_up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Spring Boot instance down"
+        description: "Application instance is not responding to actuator endpoints"
+
+  # System Resource Monitoring Rules
+  - name: system_resources
+    rules:
+    # Warning alert for high CPU usage
+    - alert: HighCPUUsage
+      expr: system_cpu_usage > 0.9
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage"
+        description: "System CPU usage above 90%"
+
+    # Warning alert for high JVM memory usage
+    - alert: HighMemoryUsage
+      expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.9
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High JVM memory usage"
+        description: "JVM memory usage above 90%"
+
+    # Warning alert for low disk space
+    - alert: LowDiskSpace
+      expr: disk_free_bytes / disk_total_bytes < 0.1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low disk space"
+        description: "Available disk space below 10%"
+
+  # Application Metrics Recording Rules
+  - name: application_metrics
+    rules:
+    # Record request rate over 5 minute windows
+    - record: application:request_rate:5m
+      expr: rate(http_server_requests_seconds_count[5m])
+      labels:
+        job: spring-boot
+
+    # Record error rate over 5 minute windows
+    - record: application:error_rate:5m
+      expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m])
+      labels:
+        job: spring-boot
+
+    # Record average response time over 5 minute windows
+    - record: application:response_time:5m
+      expr: rate(http_server_requests_seconds_sum[5m]) / rate(http_server_requests_seconds_count[5m])
+      labels:
+        job: spring-boot
