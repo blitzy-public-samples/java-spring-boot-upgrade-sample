@@ -1,0 +1,76 @@
+# Compiled class files
+*.class
+target/
+build/
+bin/
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+.sts4-cache
+.metadata/
+.recommenders/
+
+# Logs
+logs/
+*.log
+build.log
+
+# Maven specific
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
+dependency-reduced-pom.xml
+settings.xml
+interpolated*.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Spring Boot specific
+application-*.properties
+!application-example.properties
+MANIFEST.MF
+activemq-data/
+transaction-logs/
+dump.rdb
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Test reports
+test-output/
+reports/
+
+# Docker
+.docker/
+manifest.yml
+
+# Misc
+*.sw?
+*~
+.#*
+*.md.html
+secrets.yml
+overridedb.*
+.gradle/
+.gradletasknamecache
+code/
