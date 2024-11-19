@@ -1,0 +1,109 @@
+# Kubernetes Deployment template for Spring Boot 3 application
+# Required human tasks:
+# 1. Ensure container registry has the spring-boot-2-sample-app image with proper tags
+# 2. Verify resource quotas match cluster capacity
+# 3. Confirm Spring profiles and actuator endpoints are properly configured in application
+# 4. Review security context settings match organizational policies
+
+# Using Kubernetes v1.24+ API
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spring-boot-app.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "spring-boot-app.name" . }}
+    helm.sh/chart: {{ include "spring-boot-app.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    # Requirement: Spring Boot Application Deployment
+    app.kubernetes.io/version: {{ .Values.springApplication.version | quote }}
+  {{- with .Values.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+spec:
+  # Requirement: Spring Boot Application Deployment - Configure replica count
+  replicas: {{ .Values.replicaCount }}
+  
+  # Requirement: Spring Boot Application Deployment - Configure deployment strategy
+  strategy:
+    {{- toYaml .Values.deploymentStrategy | nindent 4 }}
+  
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "spring-boot-app.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "spring-boot-app.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    
+    spec:
+      # Requirement: Container Configuration - Configure container specifications
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            {{- if .Values.actuator.enabled }}
+            - name: actuator
+              containerPort: {{ .Values.actuator.port }}
+              protocol: TCP
+            {{- end }}
+          
+          # Requirement: Spring Boot Application Deployment - Configure environment variables
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springApplication.profile }}
+            - name: SERVER_PORT
+              value: {{ .Values.service.port | quote }}
+            {{- if .Values.actuator.enabled }}
+            - name: MANAGEMENT_SERVER_PORT
+              value: {{ .Values.actuator.port | quote }}
+            - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+              value: {{ .Values.actuator.path }}
+            {{- end }}
+          
+          # Requirement: Health Monitoring - Configure liveness probe
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          
+          # Requirement: Health Monitoring - Configure readiness probe
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          
+          # Requirement: Spring Boot Application Deployment - Configure resource limits
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          
+          # Security context for running as non-root user
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # Termination grace period for proper shutdown
+      terminationGracePeriodSeconds: 60
