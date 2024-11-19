@@ -1,0 +1,69 @@
+# Development and Version Control
+.git
+.gitignore
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+
+# IDE and Editor Files
+.project
+.idea/
+.vscode/
+*.tmproj
+.DS_Store
+
+# Security and Credentials
+*.pem
+*.key
+*.env
+
+# Dependencies and Package Managers
+node_modules/
+charts/
+
+# Temporary Directories
+tmp/
+temp/
+
+# Java/Spring Boot Build and Development Files
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.settings/
+.classpath
+.factorypath
+.springBeans
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+
+# IntelliJ IDEA Specific
+*.iml
+*.iws
+*.ipr
+
+# Gradle and Build Outputs
+.gradle/
+build/
+bin/
+out/
+dependency-reduced-pom.xml
+
+# Documentation and Text Files
+README.md
+LICENSE
+*.txt
+*.md
+*.log
+
+# Configuration Files (excluding Helm essentials)
+*.properties
+*.yml
+*.yaml
+!values.yaml
+!Chart.yaml
