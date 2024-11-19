@@ -1,0 +1,51 @@
+# Use Eclipse Temurin Java 17 JRE as base image
+# eclipse-temurin version: 17-jre-jammy
+FROM eclipse-temurin:17-jre-jammy
+
+# Create a list of tasks that need human attention
+# HUMAN_TASKS:
+# 1. Ensure target/*.jar exists before building the image
+# 2. Verify that Spring Boot Actuator is enabled and health endpoint is exposed
+# 3. Review security settings and adjust if needed based on deployment environment
+# 4. Ensure proper network access for health check functionality
+
+# Create non-root user for security
+# Requirement Addressed: Security Hardening - Non-root User
+RUN groupadd -r spring && useradd -r -g spring spring
+
+# Create dedicated application directory
+# Requirement Addressed: Container Image Creation
+RUN mkdir /app && chown spring:spring /app
+
+# Install wget for health checks
+# wget version: latest
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+# Copy pre-built Spring Boot JAR into container
+# Requirement Addressed: Container Image Creation
+COPY target/*.jar /app/spring-boot-application.jar
+RUN chown spring:spring /app/spring-boot-application.jar
+
+# Switch to non-root user
+USER spring:spring
+
+# Expose Spring Boot application port
+# Requirement Addressed: Container Image Creation
+EXPOSE 8080
+
+# Configure container startup with security and performance optimizations
+# Requirement Addressed: Java Runtime Environment
+ENTRYPOINT ["java", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-jar", \
+    "/app/spring-boot-application.jar"]
+
+# Add container health monitoring
+# Requirement Addressed: Health Monitoring
+HEALTHCHECK --interval=1m --timeout=3s \
+    CMD wget -q -T 3 -s http://localhost:8080/actuator/health/ || exit 1
