@@ -1,0 +1,55 @@
+{{/* 
+Requirement Addressed: Spring Boot Application Deployment
+- Provides instructions for accessing the deployed Spring Boot application
+- Includes actuator endpoints, health check and management endpoints
+- Shows service access details
+*/}}
+
+Thank you for installing {{ .Chart.Name }} version {{ .Chart.Version }}
+
+Application Details:
+-------------------
+Release Name: {{ .Release.Name }}
+Release Namespace: {{ .Release.Namespace }}
+Spring Profile: {{ .Values.springApplication.profile }}
+Application Version: {{ .Values.springApplication.version }}
+
+Service Access:
+--------------
+Your application can be accessed within the cluster at:
+  http://{{ .Release.Name }}-{{ .Chart.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+{{- if .Values.actuator.enabled }}
+Monitoring and Management:
+-------------------------
+Actuator endpoints are enabled and can be accessed at:
+
+Base Actuator Path:
+  http://{{ .Release.Name }}-{{ .Chart.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.actuator.port }}{{ .Values.actuator.path }}
+
+Available Endpoints:
+- Health Check: {{ .Values.actuator.path }}/health
+- Application Info: {{ .Values.actuator.path }}/info
+- Metrics: {{ .Values.actuator.path }}/metrics
+- Environment: {{ .Values.actuator.path }}/env
+{{- end }}
+
+{{- if eq .Values.service.type "LoadBalancer" }}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+      You can watch the status by running:
+      
+      kubectl get svc --namespace {{ .Release.Namespace }} -w {{ .Release.Name }}-{{ .Chart.Name }}
+{{- end }}
+
+{{- if eq .Values.service.type "ClusterIP" }}
+NOTE: The application is only accessible from within the cluster network.
+      To access it from your local machine, you can use port-forwarding:
+      
+      kubectl port-forward svc/{{ .Release.Name }}-{{ .Chart.Name }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+
+For more information about the deployment, run:
+  kubectl describe deployment {{ .Release.Name }}-{{ .Chart.Name }} -n {{ .Release.Namespace }}
+
+To view the application logs:
+  kubectl logs -f deployment/{{ .Release.Name }}-{{ .Chart.Name }} -n {{ .Release.Namespace }}
