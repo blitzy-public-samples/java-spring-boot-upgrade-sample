@@ -1,0 +1,84 @@
+# Docker Compose version 3.8 specification
+version: '3.8'
+
+# Service definitions for Spring Boot application and H2 database
+services:
+  # Spring Boot 3 Application Service
+  # Addresses requirement: Docker Development Environment - Containerized Spring Boot application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      # Actuator configuration for health monitoring
+      # Addresses requirement: Health Monitoring - Enable monitoring endpoints
+      - MANAGEMENT_SERVER_ADDRESS=127.0.0.1
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_ENDPOINT_SHUTDOWN_ENABLED=true
+      # Server and logging configuration
+      - SERVER_TOMCAT_ACCESSLOG_ENABLED=true
+      - SPRING_JMX_ENABLED=true
+      # JVM configuration
+      # Addresses requirement: Java Version Migration - JVM settings for Java 17
+      - JAVA_OPTS=-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom
+    volumes:
+      - ./:/app:rw
+      - ~/.m2:/root/.m2:rw
+    networks:
+      - backend
+    depends_on:
+      - db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "3", "-s", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # H2 Database Service
+  db:
+    image: h2:latest
+    container_name: h2-database
+    ports:
+      - "1521:1521"  # H2 TCP server port
+      - "8082:81"    # H2 Web Console port
+    environment:
+      - H2_OPTIONS=-ifNotExists
+    volumes:
+      - h2-data:/h2-data:rw
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1521"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Volume configuration for persistent H2 database storage
+volumes:
+  h2-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/h2-data
+      o: bind
+
+# Network configuration for service isolation
+networks:
+  backend:
+    driver: bridge
+    name: spring-boot-network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
