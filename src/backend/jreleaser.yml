@@ -1,0 +1,47 @@
+# JReleaser configuration for Spring Boot Actuator Sample
+# Required for Spring Boot 3 Migration - Automates release process for the migrated Spring Boot 3 application
+
+project:
+  name: spring-boot-sample-actuator
+  description: Spring Boot Actuator Sample Application demonstrating production-ready features
+  version: ${project.version}
+  java:
+    version: 17
+
+release:
+  github:
+    owner: ${project.owner}
+    name: ${project.name}
+    tagName: v{{projectVersion}}
+    draft: false
+    prerelease: false
+    overwrite: false
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      format: '- {{commitShortHash}} {{commitTitle}}'
+
+distributions:
+  app:
+    artifacts:
+      - path: target/{{projectName}}-{{projectVersion}}.jar
+        platform: any
+
+packagers:
+  docker:
+    active: true
+    baseImage: eclipse-temurin:17-jre-alpine
+    imageNames:
+      - '{{dockerImageName}}:{{projectVersion}}'
+      - '{{dockerImageName}}:latest'
+    labels:
+      org.opencontainers.image.title: '{{projectName}}'
+      org.opencontainers.image.description: '{{projectDescription}}'
+      org.opencontainers.image.version: '{{projectVersion}}'
+
+# Human Tasks:
+# 1. Configure GitHub repository owner in environment variables or CI/CD pipeline (${project.owner})
+# 2. Set up GitHub authentication token with required permissions for release creation
+# 3. Configure Docker registry credentials if using private registry
+# 4. Verify Docker base image availability and security patches
+# 5. Set up appropriate CI/CD pipeline triggers for automated releases
