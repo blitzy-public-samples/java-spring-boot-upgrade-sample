@@ -1,0 +1,39 @@
+# Human Tasks:
+# 1. Verify that the service port 80 is not conflicting with other services in the cluster
+# 2. Ensure network policies allow traffic to the service port and target port 8080
+# 3. Consider implementing external load balancer for production workloads if needed
+# 4. Review and adjust service type based on environment requirements (ClusterIP vs LoadBalancer)
+
+# Requirement: Application Service Exposure
+# Defines the Kubernetes service configuration for exposing the Spring Boot application
+# and its actuator endpoints for health monitoring and metrics collection
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-app-service
+  namespace: default
+  labels:
+    # Labels match the deployment configuration for consistency
+    app: spring-boot-app
+    environment: production
+
+spec:
+  # Requirement: Application Service Exposure
+  # Using ClusterIP for internal cluster access
+  # Change to LoadBalancer or NodePort if external access is needed
+  type: ClusterIP
+  
+  # Port configuration for HTTP traffic
+  ports:
+    - name: http
+      # Service port that will be exposed
+      port: 80
+      # Target port matching the container port in deployment
+      targetPort: 8080
+      protocol: TCP
+  
+  # Requirement: Application Service Exposure
+  # Selector matches the pod labels defined in deployment.yml
+  # This ensures traffic is routed to the correct application pods
+  selector:
+    app: spring-boot-app
