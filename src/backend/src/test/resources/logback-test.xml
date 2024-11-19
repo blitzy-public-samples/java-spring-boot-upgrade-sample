@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Requirements addressed:
+1. Spring Boot 3 Migration - Test logging configuration updated for Spring Boot 3 compatibility
+2. Test Environment Logging - Configures logging behavior specifically for test execution environment
+
+Dependencies:
+- ch.qos.logback:logback-core:1.4.0
+- org.springframework.boot:spring-boot-test:3.0.0
+-->
+<configuration>
+    <!-- Import Spring Boot base logging configuration -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    
+    <!-- Import main application logging configuration -->
+    <include resource="../../../main/resources/logback-spring.xml"/>
+
+    <!-- Global properties for test logging patterns -->
+    <property name="LOG_LEVEL_PATTERN" value="%5p"/>
+    <property name="TEST_LOG_PATTERN" 
+              value="${TEST_LOG_PATTERN:-%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n}"/>
+
+    <!-- Root Logger Configuration -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Test-specific logger configurations -->
+    <logger name="org.springframework.test" level="INFO"/>
+    <logger name="org.springframework.boot.test" level="INFO"/>
+</configuration>
