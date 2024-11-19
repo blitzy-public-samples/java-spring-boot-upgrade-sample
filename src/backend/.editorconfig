@@ -1,0 +1,41 @@
+# EditorConfig configuration for Spring Boot application
+# Version: 0.15.3
+# Purpose: Standardizes code formatting and editor behavior across different development environments
+# Requirements Addressed:
+# - Code Style Standardization (Technical Specification/Spring Boot Migration)
+# - Java Code Formatting (Technical Specification/Spring Boot Migration)
+
+# top-most EditorConfig file
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+# Java specific settings
+[*.java]
+indent_size = 4
+max_line_length = 120
+
+# XML files
+[*.xml]
+indent_size = 4
+
+# Properties files
+[*.properties]
+indent_size = 4
+
+# YAML files
+[*.yml]
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
