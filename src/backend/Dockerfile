@@ -1,6 +1,6 @@
 # Stage 1: Build the application using Maven
 # Maven 3.9.4 with Eclipse Temurin JDK 17 for building the application
-FROM maven:3.9.4-eclipse-temurin-17 AS MAVEN_BUILD
+FROM maven:3.9.8-eclipse-temurin-22 AS MAVEN_BUILD
 
 # Copy pom.xml first to leverage Docker cache for dependencies
 COPY pom.xml /tmp/
