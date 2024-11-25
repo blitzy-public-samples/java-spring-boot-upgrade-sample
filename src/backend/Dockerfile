@@ -19,7 +19,7 @@ RUN mvn -B package
 
 # Stage 2: Runtime environment
 # Eclipse Temurin JRE 17 for minimal runtime image
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 # Add metadata labels
 LABEL maintainer="Spring Boot Sample Application Team" \
