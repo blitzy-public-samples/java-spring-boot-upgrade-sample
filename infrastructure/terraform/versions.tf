@@ -13,7 +13,7 @@ terraform {
     # Version ~> 4.0 provides stability while allowing minor version updates
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.78"
     }
 
     # Kubernetes Provider for container orchestration
